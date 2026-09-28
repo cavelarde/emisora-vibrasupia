@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibra Supía | En Vivo</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --fondo: #050505;
+            --naranja: #ff6a00;
+            --rosa: #ff0055;
+            --azul: #00d4ff;
+            --verde-lima: #a6ce39;
+            --vidrio: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            margin: 0; background-color: var(--fondo); color: white;
+            font-family: 'Montserrat', sans-serif; min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        /* Contenedor Principal en 2 Columnas */
+        .main-container {
+            display: flex;
+            flex-direction: row;
+            gap: 40px;
+            max-width: 1200px;
+            width: 95%;
+            padding: 40px 20px;
+            align-items: flex-start;
+        }
+
+        /* --- COLUMNA IZQUIERDA: REPRODUCTOR --- */
+        .left-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: sticky;
+            top: 40px;
+        }
+
+        .header img { max-width: 280px; filter: drop-shadow(0 0 15px var(--naranja)); margin-bottom: 10px; }
+        h1 { font-family: 'Orbitron', sans-serif; font-size: 1.1rem; text-align: center; margin-bottom: 30px;
+             background: linear-gradient(to right, var(--naranja), var(--rosa)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        body {
+            background-color: #1e1e24;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+            color: white;
+        }
+        canvas {
+            background: #000;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        audio {
+            margin-top: 20px;
+            width: 300px;
+        }
+
+        .player-box {
+            background: var(--vidrio); border: 1px solid rgba(255,255,255,0.1);
+            padding: 30px; border-radius: 25px; width: 100%; max-width: 350px;
+            backdrop-filter: blur(15px); text-align: center;
+        }
+        audio { width: 100%; filter: invert(1); margin-top: 15px; }
+
+        /* --- COLUMNA DERECHA: PROGRAMACIÓN --- */
+        .right-column {
+            flex: 1.2;
+            background: rgba(255,255,255,0.03);
+            padding: 30px;
+            border-radius: 25px;
+            border: 1px solid rgba(255,255,255,0.05);
+            max-height: 85vh;
+            overflow-y: auto; /* Permite scroll interno si la lista es larga */
+        }
+
+        .schedule h2 { font-family: 'Orbitron', sans-serif; color: var(--verde-lima); font-size: 1.4rem; margin-top: 0; text-align: center; border-bottom: 1px solid rgba(166, 206, 57, 0.3); padding-bottom: 15px; }
+        
+        .grid-schedule { display: flex; flex-direction: column; gap: 15px; }
+        
+        .time-slot {
+            background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px;
+            border-left: 5px solid var(--naranja); transition: transform 0.3s;
+        }
+        .time-slot:hover { transform: translateX(10px); background: rgba(255,255,255,0.05); }
+        .time { color: var(--azul); font-weight: bold; font-size: 0.85rem; }
+        .show-name { font-weight: 700; display: block; margin: 5px 0; font-size: 1.1rem; }
+        .desc { font-size: 0.8rem; color: #aaa; line-height: 1.4; }
+
+        /* Responsivo para móviles */
+        @media (max-width: 900px) {
+            .main-container { flex-direction: column; align-items: center; }
+            .left-column { position: static; margin-bottom: 40px; }
+            .right-column { width: 100%; max-height: none; }
+                /* Estilos de Redes Sociales */
+        .social-bar {
+            margin-top: 25px;
+            text-align: center;
+        }
+        .social-links {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        .social-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: all 0.3s ease;
+        }
+        /* Colores Neón al pasar el mouse */
+        .social-icon.fb:hover { background: #1877F2; box-shadow: 0 0 15px #1877F2; border-color: transparent; }
+        .social-icon.ig:hover { background: #E1306C; box-shadow: 0 0 15px #E1306C; border-color: transparent; }
+        .social-icon.tt:hover { background: #000000; box-shadow: 0 0 15px #00f2ea; border-color: #ff0050; }
+
+        /* Importante: Añadir esta línea en el <head> para los iconos */
+    </style>
+    <script src="https://fontawesome.com" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cloudflare.com">
+
+
+       
+</head>
+<body>
+
+    <div class="main-container">
+        
+        <!-- COLUMNA IZQUIERDA -->
+        <div class="left-column">
+            <div class="header">
+                <img src="https://i.imgur.com/DhgMRQf.png" alt="Vibra Supía">
+                <h1>LA MÚSICA QUE TE CONECTAAAA!</h1>
+            </div>        
+
+            <div class="player-box">
+			
+                <p style="margin: 0; font-size: 0.8rem; color: var(--azul); font-weight: bold;">● EN VIVO</p>
+               <audio id="audio" src="https://stream-177.zeno.fm/hvq3rznonqotv" crossorigin="anonymous" controls></audio>
+    <br>
+    <canvas id="canvas" width="350" height="100"></canvas>
+            </div>
+			        <!-- Bloque de Redes Sociales (Añadir debajo del player-box) -->
+            <div class="social-bar">
+                <p style="font-size: 0.7rem; color: #888; margin-bottom: 10px; letter-spacing: 1px;">SÍGUENOS EN WHATSAPP 3169896363</p>
+				<i class="fa-brands fa-whatsapp"></i>
+                <div class="">
+                
+				
+                    <!-- Facebook -->
+                    <a href="TU_LINK_FACEBOOK" target="_blank" class="social-icon fb">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <!-- Instagram -->
+                    <a href="TU_LINK_INSTAGRAM" target="_blank" class="social-icon ig">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                   
+                </div>
+            </div>
+        </div>
+		    
+        <!-- COLUMNA DERECHA -->
+        <div class="right-column">
+            <div class="schedule">
+                <h2>NUESTRA PROGRAMACIÓN</h2>
+                <div class="grid-schedule">
+                    <div class="time-slot" style="border-left-color: #ff9800;">
+                        <span class="time">6:00 AM - 9:00 AM</span>
+                        <span class="show-name" style="color: #ffeb3b;">BUENOS DÍAS SUPÍA</span>
+                        <span class="desc">Empieza tu día con la mejor energía y música variada.</span>
+                    </div>
+                    <div class="time-slot" style="border-left-color: #e91e63;">
+                        <span class="time">9:00 AM - 12:00 PM</span>
+                        <span class="show-name" style="color: #ff4081;">MAÑANAS EN VIBRA</span>
+                        <span class="desc">Éxitos actuales, clásicos y mucho más.</span>
+                    </div>
+                    <div class="time-slot" style="border-left-color: #2196f3;">
+                        <span class="time">12:00 PM - 2:00 PM</span>
+                        <span class="show-name" style="color: #03a9f4;">ALMUERZO MUSICAL</span>
+                        <span class="desc">La mejor compañía para tu mediodía.</span>
+                    </div>
+                    <div class="time-slot" style="border-left-color: #8bc34a;">
+                        <span class="time">2:00 PM - 5:00 PM</span>
+                        <span class="show-name" style="color: #cddc39;">TARDES EN SINTONÍA</span>
+                        <span class="desc">Música variada para acompañar tu tarde.</span>
+                    </div>
+                    <div class="time-slot" style="border-left-color: #9c27b0;">
+                        <span class="time">5:00 PM - 7:00 PM</span>
+                        <span class="show-name" style="color: #e040fb;">RITMOS QUE CONECTAN</span>
+                        <span class="desc">Los mejores éxitos para disfrutar y compartir.</span>
+                    </div>
+                    <div class="time-slot" style="border-left-color: #ffc107;">
+                        <span class="time">7:00 PM - 10:00 PM</span>
+                        <span class="show-name" style="color: #ffeb3b;">NOCHE DE ÉXITOS</span>
+                        <span class="desc">Clásicos, pop, rock, reggaetón y mucho más.</span>
+                    </div>
+                    <div class="time-slot" style="border-left-color: #3f51b5;">
+                        <span class="time">10:00 PM - 6:00 AM</span>
+                        <span class="show-name" style="color: #5c6bc0;">SUPÍA EN LA NOCHE</span>
+                        <span class="desc">Música para relajarte y acompañar tus sueños.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+<script>
+        const audio = document.getElementById('audio');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        let audioCtx, analyser, source, bufferLength, dataArray;
+        let initialized = false;
+
+        // Inicializa la Web Audio API tras la primera interacción del usuario
+        audio.addEventListener('play', () => {
+            if (!initialized) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                
+                source = audioCtx.createMediaElementSource(audio);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                
+                // Configuración de las frecuencias
+                analyser.fftSize = 64; // Controla el número de barras (más alto = más barras)
+                bufferLength = analyser.frequencyBinCount;
+                dataArray = new Uint8Array(bufferLength);
+                
+                initialized = true;
+                draw();
+            }
+        });
+
+        function draw() {
+            requestAnimationFrame(draw);
+            
+            // Obtener los datos de frecuencia actuales
+            analyser.getByteFrequencyData(dataArray);
+            
+            // Limpiar el lienzo en cada frame
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const barWidth = (canvas.width / bufferLength) * 1.5;
+            let barHeight;
+            let x = 0;
+            
+            for (let i = 0; i < bufferLength; i++) {
+                barHeight = dataArray[i] / 1.8; // Ajusta la altura máxima
+                
+                // Color degradado para las barras
+                ctx.fillStyle = `rgb(${barHeight + 100}, 50, 250)`;
+                
+                // Dibujar cada barra
+                ctx.fillRect(x, canvas.height - barHeight, barWidth - 2, barHeight);
+                
+                x += barWidth;
+            }
+        }
+    </script>
+    
+
+</body>
+</html>
